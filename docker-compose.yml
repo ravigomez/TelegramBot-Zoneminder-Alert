@@ -18,7 +18,7 @@ services:
     restart: always
     volumes:
       - downloads:/usr/src/app/src/Downloads:rw
-      - localDB:/usr/src/app/src/localDB:rw
+      - localDB:/usr/src/app/localDB:rw
     networks:
       - telegram-bot
     depends_on:
