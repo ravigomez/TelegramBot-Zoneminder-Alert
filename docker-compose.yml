@@ -11,10 +11,14 @@ services:
     networks:
       - telegram-bot
   telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: telegram-bot:1.0.0
     restart: always
     volumes:
       - downloads:/usr/src/app/src/Downloads:rw
+      - localDB:/usr/src/app/src/localDB:rw
     networks:
       - telegram-bot
     depends_on:
@@ -28,3 +32,4 @@ networks:
 
 volumes:
   downloads:
+  localDB:
