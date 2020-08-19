@@ -126,3 +126,4 @@ dmypy.json
 .vscode/settings.json
 src/.DS_Store
 .DS_Store
+localDB/*
