@@ -17,7 +17,7 @@ services:
     image: telegram-bot:1.0.0
     restart: always
     volumes:
-      - downloads:/usr/src/app/src/Downloads:rw
+      - downloads:/usr/src/app/src/Downloads:r
       - localDB:/usr/src/app/localDB:rw
     networks:
       - telegram-bot
