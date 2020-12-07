@@ -70,6 +70,7 @@ def main():
     dp.add_handler(CommandHandler("removeuser", removeUser))
     dp.add_handler(CommandHandler("latest", latest))
     dp.add_handler(CommandHandler("help", help_command))
+    dp.add_handler(CommandHandler("getrange", getrange))
 
     # Start the Bot
     updater.start_polling()
@@ -134,6 +135,56 @@ def latest(update, context):
 
     update.message.reply_text('Reading events...')
     events = ZoneMinderDB().latestEvents(latesteEventID)
+
+    update.message.reply_text(f'The bot is processing {len(events)} videos...')
+
+    if len(events) > 0:
+        ZoneMinderScraper().processVideos(events)
+
+        for id in events:
+            subprocess.call(
+                f'ffmpeg -y -i src/Downloads/Event-_{id}-r4-s1.avi -strict -2 src/videos/{id}.mp4', shell=True)
+
+        erro = False
+        for id in events:
+            try:
+                context.bot.send_video(update.message.chat_id,
+                                       video=open(f'src/videos/{id}.mp4', 'rb'), timeout=240)
+
+            except:
+                update.message.reply_text(
+                    f'Erro while try to send video id: {id}')
+                print(f'Erro while try to send video id: {id}')
+                erro = True
+
+        if not erro:
+            update.message.reply_text('You have all the videos.')
+
+            latesteEventID = events[len(events) - 1]
+
+            if len(table.all()) > 0:
+                table.update({'EventID': latesteEventID})
+            else:
+                table.insert({'EventID': latesteEventID})
+
+        for id in events:
+            if os.path.exists(f'src/Downloads/Event-_{id}-r4-s1.avi'):
+                os.remove(f'src/Downloads/Event-_{id}-r4-s1.avi')
+            if os.path.exists(f'src/videos/{id}.mp4'):
+                os.remove(f'src/videos/{id}.mp4')
+
+
+def getrange(update, context):
+    if not __allowedUser(update):
+        update.message.reply_text(
+            f'You don\'t have permission to use this Bot.')
+        return
+
+    table = db.table('Config')
+    range = update.message.text.replace('/getrange', '').strip().split('-')
+
+    update.message.reply_text('Reading events...')
+    events = ZoneMinderDB().rangeEvents(range[0], range[1])
 
     update.message.reply_text(f'The bot is processing {len(events)} videos...')
 
