@@ -137,8 +137,13 @@ def latest(update, context):
 
     update.message.reply_text(f'The bot is processing {len(events)} videos...')
 
+    scrapper = ZoneMinderScraper()
+
     if len(events) > 0:
-        ZoneMinderScraper().processVideos(events)
+        scrapper.processVideos(events)
+
+        for id in scrapper.videoListError:
+            events.remove(id)
 
         for id in events:
             subprocess.call(
@@ -155,6 +160,9 @@ def latest(update, context):
                     f'Erro while try to send video id: {id}')
                 print(f'Erro while try to send video id: {id}')
                 erro = True
+
+        update.message.reply_text(
+            f'Videos with error: {scrapper.videoListError}')
 
         if not erro:
             update.message.reply_text('You have all the videos.')

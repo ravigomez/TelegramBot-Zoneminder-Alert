@@ -15,6 +15,9 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class ZoneMinderScraper():
+
+    videoListError = []
+
     def __init__(self):
         super().__init__()
 
@@ -44,22 +47,25 @@ class ZoneMinderScraper():
 
     def scrap(self, driver, videoID):
 
-        driver.get(
-            f'{os.environ.get("ZONEMINDER_URL")}/zm/index.php?view=video&eid={videoID}&popup=1')
+        try:
+            driver.get(
+                f'{os.environ.get("ZONEMINDER_URL")}/zm/index.php?view=video&eid={videoID}&popup=1')
 
-        time.sleep(1)
-        self.__setCombobox(driver, '//*[@id="rate"]', '4x')
-        time.sleep(1)
-        self.__click(driver, '//*[@id="contentForm"]/button')
-        time.sleep(1)
-        self.__click(driver, '//*[@id="videoTable"]/tbody/tr/td[5]/a[2]')
-        time.sleep(1)
-        self.__click(driver, '//*[@id="videoTable"]/tbody/tr/td[5]/a[3]')
-        time.sleep(1)
-
-        # wait until file exists
-        while not os.path.isfile(f'src/Downloads/Event-_{videoID}-r4-s1.avi'):
             time.sleep(1)
+            self.__setCombobox(driver, '//*[@id="rate"]', '4x')
+            time.sleep(1)
+            self.__click(driver, '//*[@id="contentForm"]/button')
+            time.sleep(1)
+            self.__click(driver, '//*[@id="videoTable"]/tbody/tr/td[5]/a[2]')
+            time.sleep(1)
+            self.__click(driver, '//*[@id="videoTable"]/tbody/tr/td[5]/a[3]')
+            time.sleep(1)
+
+            # wait until file exists
+            while not os.path.isfile(f'src/Downloads/Event-_{videoID}-r4-s1.avi'):
+                time.sleep(1)
+        except:
+            self.videoListError.append(videoID)
 
     def processVideos(self, IDs):
 
