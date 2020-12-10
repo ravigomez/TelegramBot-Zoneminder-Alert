@@ -161,8 +161,9 @@ def latest(update, context):
                 print(f'Erro while try to send video id: {id}')
                 erro = True
 
-        update.message.reply_text(
-            f'Videos with error: {scrapper.videoListError}')
+        if len(scrapper.videoListError) > 0:
+            update.message.reply_text(
+                f'Videos with error: {scrapper.videoListError}')
 
         if not erro:
             update.message.reply_text('You have all the videos.')
