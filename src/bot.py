@@ -175,10 +175,13 @@ def latest(update, context):
                 table.insert({'EventID': latesteEventID})
 
         for id in events:
-            if os.path.exists(f'src/Downloads/Event-_{id}-r4-s1.avi'):
-                os.remove(f'src/Downloads/Event-_{id}-r4-s1.avi')
-            if os.path.exists(f'src/videos/{id}.mp4'):
-                os.remove(f'src/videos/{id}.mp4')
+            try:
+                if os.path.exists(f'src/Downloads/Event-_{id}-r4-s1.avi'):
+                    os.remove(f'src/Downloads/Event-_{id}-r4-s1.avi')
+                if os.path.exists(f'src/videos/{id}.mp4'):
+                    os.remove(f'src/videos/{id}.mp4')
+            except:
+                pass
 
 
 if __name__ == '__main__':
