@@ -19,7 +19,7 @@ class ZoneMinderScraper():
         super().__init__()
 
     def __click(self, driver, element_XPATH):
-        element = WebDriverWait(driver, 20).until(
+        element = WebDriverWait(driver, 60).until(
             EC.presence_of_element_located(
                 (By.XPATH, element_XPATH))
         )
