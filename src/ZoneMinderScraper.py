@@ -57,6 +57,10 @@ class ZoneMinderScraper():
         self.__click(driver, '//*[@id="videoTable"]/tbody/tr/td[5]/a[3]')
         time.sleep(1)
 
+        # wait until file exists
+        while not os.path.isfile(f'src/Downloads/Event-_{videoID}-r4-s1.avi'):
+            time.sleep(1)
+
     def processVideos(self, IDs):
 
         gettrace = getattr(sys, 'gettrace', None)
