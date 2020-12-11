@@ -143,7 +143,10 @@ def latest(update, context):
         scrapper.processVideos(events)
 
         for id in scrapper.videoListError:
-            events.remove(id)
+            try:
+                events.remove(id)
+            except ValueError:
+                pass
 
         for id in events:
             subprocess.call(
