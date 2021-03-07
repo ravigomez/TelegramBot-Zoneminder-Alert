@@ -74,7 +74,7 @@ class ZoneMinderScraper():
         if gettrace() is None:
             options.add_argument("--headless")
 
-        videoListError = []
+        self.videoListError = []
 
         driver = webdriver.Remote(
             command_executor=os.environ.get('SELENIUM_DRIVER'),
