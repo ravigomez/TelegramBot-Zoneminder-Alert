@@ -4,6 +4,7 @@ import subprocess
 import time
 
 from os.path import join, dirname
+from requests import get
 from dotenv import load_dotenv
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -70,6 +71,7 @@ def main():
     dp.add_handler(CommandHandler("removeuser", removeUser))
     dp.add_handler(CommandHandler("latest", latest))
     dp.add_handler(CommandHandler("help", help_command))
+    dp.add_handler(CommandHandler("getip", getPublicIP))
 
     # Start the Bot
     updater.start_polling()
@@ -187,6 +189,17 @@ def latest(update, context):
             except:
                 pass
 
+def getPublicIP(update, context):
+    if not __allowedUser(update):
+        update.message.reply_text(
+            f'You don\'t have permission to use this Bot.')
+        return
+    update.message.reply_text('Getting Public IP...')
+    try:
+        ip = get('https://api.ipify.org').text
+        update.message.reply_text(f'Your Public IP is: {ip}')
+    except:
+        update.message.reply_text('ERROR while trying to get Public IP')
 
 if __name__ == '__main__':
     main()
