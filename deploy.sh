@@ -1,4 +1,4 @@
 git pull
-./scripts/stop.sh 
 docker-compose build
+./scripts/stop.sh 
 ./scripts/start.sh 
