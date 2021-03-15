@@ -69,6 +69,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("adduser", addUser))
     dp.add_handler(CommandHandler("removeuser", removeUser))
+    dp.add_handler(CommandHandler("listusers", listUsers))
     dp.add_handler(CommandHandler("latest", latest))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("getip", getPublicIP))
@@ -83,8 +84,8 @@ def main():
 
 
 def help_command(update, context):
-    """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
+    listCommands(update, context)
 
 
 def addUser(update, context):
@@ -120,6 +121,15 @@ def removeUser(update, context):
 
     update.message.reply_text(reply)
 
+def listUsers(update, context):
+    reply = ''
+    if __isTheOwner(update):
+        reply = 'NOT IMPLEMENTED. CONTACT THE DEVELOPER'
+        #table = db.table('AllowedUsers')
+        #users = table.get(Query())
+    else:
+        reply = 'You don\'t have permission. Only the owner can add new users.'
+    update.message.reply_text(reply)
 
 def latest(update, context):
     if not __allowedUser(update):
@@ -188,6 +198,7 @@ def latest(update, context):
                     os.remove(f'src/videos/{id}.mp4')
             except:
                 pass
+    listCommands(update, context)
 
 def getPublicIP(update, context):
     if not __allowedUser(update):
@@ -207,6 +218,9 @@ def listCommands(update, context):
     update.message.reply_text('Commands Available')
     update.message.reply_text('/getip')
     update.message.reply_text('/latest')
+    update.message.reply_text('/removeuser')
+    update.message.reply_text('/adduser')
+    update.message.reply_text('/listusers')
 
 if __name__ == '__main__':
     main()
