@@ -200,6 +200,13 @@ def getPublicIP(update, context):
         update.message.reply_text(f'Your Public IP is: {ip}')
     except:
         update.message.reply_text('ERROR while trying to get Public IP')
+    
+    listCommands(update, context)
+
+def listCommands(update, context):
+    update.message.reply_text('Commands Available')
+    update.message.reply_text('/getip')
+    update.message.reply_text('/latest')
 
 if __name__ == '__main__':
     main()
