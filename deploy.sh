@@ -6,7 +6,7 @@ docker-compose build
 ./scripts/start.sh
 
 while :; do
-    CONTAINER_ID=$(docker ps | grep jenkins | fmt -w 1 | head -n1)
+    CONTAINER_ID=$(docker ps | grep telegram-bot_selenium-chrome | fmt -w 1 | head -n1)
     if [ $CONTAINER_ID ]; then
         docker exec -it $CONTAINER_ID sudo chown -R seluser:seluser /home/seluser/Downloads
         break;
