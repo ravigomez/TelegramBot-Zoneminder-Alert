@@ -10,4 +10,6 @@ COPY .env .
 COPY src/requirements.txt ./src
 RUN pip install --no-cache-dir -r src/requirements.txt
 COPY src/ ./src
+RUN mkdir scripts
+COPY scripts/ ./scripts
 CMD [ "python", "src/bot.py" ]
