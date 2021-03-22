@@ -189,15 +189,9 @@ def latest(update, context):
                 table.update({'EventID': latesteEventID})
             else:
                 table.insert({'EventID': latesteEventID})
+        
+        os.system("./scripts/clean-work_folders.sh")
 
-        for id in events:
-            try:
-                if os.path.exists(f'src/Downloads/Event-_{id}-r4-s1.avi'):
-                    os.remove(f'src/Downloads/Event-_{id}-r4-s1.avi')
-                if os.path.exists(f'src/videos/{id}.mp4'):
-                    os.remove(f'src/videos/{id}.mp4')
-            except:
-                pass
     listCommands(update, context)
 
 def getPublicIP(update, context):
