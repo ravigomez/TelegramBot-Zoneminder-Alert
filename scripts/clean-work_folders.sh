@@ -1,6 +1,6 @@
 #! /bin/bash
 
-DIRS=("../src/Downloads/" "../src/videos/")
+DIRS=("./src/Downloads/" "./src/videos/")
 
 clean(){
   find $1 -type f -iname $2 -exec rm {} +
