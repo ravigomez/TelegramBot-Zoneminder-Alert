@@ -79,10 +79,10 @@ class ZoneMinderScraper():
         driver = webdriver.Remote(
             command_executor=os.environ.get('SELENIUM_DRIVER'),
             desired_capabilities=DesiredCapabilities.CHROME)
-
+        # to test on local chrome 
         # driver = webdriver.Chrome(
-        #    'src/chromedriver/chromedriver', options=options)
-
+        #   'src/chromedriver/chromedriver', options=options)        
+        
         driver.get(
             f'{os.environ.get("ZONEMINDER_URL")}/zm/index.php')
 
