@@ -152,7 +152,11 @@ def latest(update, context):
     scrapper = ZoneMinderScraper()
 
     if len(events) > 0:
-        scrapper.processVideos(events)
+        try:
+            scrapper.processVideos(events)
+        except:
+            update.message.reply_text('Error while trying to catch videos. Try again.')
+            exit()
 
         for id in scrapper.videoListError:
             try:
