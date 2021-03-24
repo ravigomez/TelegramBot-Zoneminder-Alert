@@ -14,7 +14,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: telegram-bot:1.0.2
+    image: telegram-bot:1.0.3
     restart: always
     volumes:
       - downloads:/usr/src/app/src/Downloads:ro
