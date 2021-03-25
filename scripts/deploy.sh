@@ -7,3 +7,4 @@ docker-compose build
 echo "Waiting for 8 secounds..."
 sleep 8
 ./scripts/update-permissions.sh
+./scripts/install_selenium-crontab.sh
