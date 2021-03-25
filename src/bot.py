@@ -156,7 +156,7 @@ def latest(update, context):
             scrapper.processVideos(events)
         except:
             update.message.reply_text('Error while trying to catch videos. Try again.')
-            exit()
+            return
 
         for id in scrapper.videoListError:
             try:
