@@ -10,6 +10,7 @@ while :; do
                                       && sudo crontab -u seluser ~/mycron \
                                       && sudo rm ~/mycron
         echo "selenium container found and crontab configured"
+        exit 0
     else
         sleep 2
     fi
