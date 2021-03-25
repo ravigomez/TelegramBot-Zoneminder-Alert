@@ -9,8 +9,9 @@ undeploy
 if [ $? -gt 0 ]; then
     sleep 2
     undeploy
-    if [ $? -gt 0]; then
+    if [ $? -gt 0 ]; then
         echo "Erro while trying to undeploy application. Unable to undeploy, try again."
+        exit 2
     fi
 fi
 
