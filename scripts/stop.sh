@@ -6,7 +6,7 @@ undeploy(){
 
 undeploy
 
-if [ $? -gt 0]; then
+if [ $? -gt 0 ]; then
     sleep 2
     undeploy
     if [ $? -gt 0]; then

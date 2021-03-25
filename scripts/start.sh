@@ -6,7 +6,7 @@ deploy(){
 
 deploy
 
-if [ $? -gt 0]; then
+if [ $? -gt 0 ]; then
     sleep 2
     deploy
     if [ $? -gt 0]; then
