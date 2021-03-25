@@ -7,7 +7,7 @@ deploy(){
 deploy
 
 if [ $? -gt 0 ]; then
-    sleep 2
+    sleep 5
     deploy
     if [ $? -gt 0 ]; then
         echo "Erro while trying to deploy application. Unable to deploy, try again."
