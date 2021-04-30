@@ -9,3 +9,6 @@ MYSQL_DATABASE=xx
 ZONEMINDER_URL=http://xxx.xxx.xxx.xxxx:xxxxxxx
 ZONEMINDER_USER=xxxxxxxx
 ZONEMINDER_PASSWORD=xxxxxxxxx
+ZONEMINDER_EVENT_ID_INITIAL=37362
+
+SELENIUM_DRIVER=http://selenium-chrome:4444/wd/hub
