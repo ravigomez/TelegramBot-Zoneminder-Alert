@@ -1,60 +1,28 @@
 import os
-import logging
-import subprocess
-import time
-
 from os.path import join, dirname
-from requests import get
+import logging
+
 from dotenv import load_dotenv
-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from tinydb import TinyDB, Query, where
+from telegram.ext.dispatcher import run_async
 
-from ZoneMinderDB import ZoneMinderDB
-from ZoneMinderScraper import ZoneMinderScraper
+from service.ZoneMinderService import ZoneMinderService
+from service.NetworkService import NetworkService
+from service.VideoService import VideoService
+from service.UserService import UserService
 
-db = TinyDB('localDB/db.json')
+UService = UserService()
+ZMService = ZoneMinderService()
+NService = NetworkService()
+VService = VideoService()
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
-
 logger = logging.getLogger(__name__)
-
 dotenv_path = join(dirname(__file__), '..', '.env')
-
 load_dotenv(dotenv_path)
 
-
-def __isTheOwner(update):
-    if update.message.from_user.name.lower() == os.environ.get('TELEGRAM_OWNER_NAME').lower():
-        return True
-    else:
-        return False
-
-
-def __allowedUser(update):
-    if __isTheOwner(update):
-        return True
-    else:
-        current_user = update.message.from_user.name.lower()
-        table = db.table('AllowedUsers')
-        user = table.get(Query().telegram_name == current_user)
-        if user is not None:
-            return True
-        else:
-            return False
-
-
-def start(update, context):
-    if __allowedUser(update):
-        context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Hello {update.message.from_user.first_name} I\'m you bot. What can I do for you?")
-    else:
-        update.message.reply_text(
-            f'You don\'t have permission to use this Bot.')
-
-
-def main():
+def main():        
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
@@ -71,8 +39,10 @@ def main():
     dp.add_handler(CommandHandler("removeuser", removeUser))
     dp.add_handler(CommandHandler("listusers", listUsers))
     dp.add_handler(CommandHandler("latest", latest))
+    dp.add_handler(CommandHandler("getevent", getEvent))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(CommandHandler("getip", getPublicIP))
+    #dp.add_handler(CommandHandler("test", test))
 
     # Start the Bot
     updater.start_polling()
@@ -82,143 +52,160 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
+def start(update, context):
+    if UService.isAllowedUser(update):
+        context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"Hello {update.message.from_user.first_name} I\'m you bot. What can I do for you?")
+    else:
+        update.message.reply_text(
+            f'You don\'t have permission to use this Bot.')
 
 def help_command(update, context):
-    update.message.reply_text('Help!')
-    listCommands(update, context)
-
+    update.message.reply_text('<-<-<- Help Menu ->->->')
+    listCommands(update)
 
 def addUser(update, context):
-    reply = ''
-    if __isTheOwner(update):
-        new_user = update.message.text.replace('/adduser', '').strip().lower()
-        if new_user != '':
-            table = db.table('AllowedUsers')
-            table.insert({'telegram_name': new_user})
+    if UService.isTheOwner(update):
+        new_user_name = update.message.text.replace('/adduser', '').strip().lower()
+        if new_user_name != '':
+            UService.addUser(new_user_name)
             reply = 'user added!'
         else:
             reply = 'You need to specify a telegram name including @.'
     else:
         reply = 'You don\'t have permission. Only the owner can add new users.'
-
-    update.message.reply_text(reply)
-
+    
+    if reply:
+        update.message.reply_text(reply)
 
 def removeUser(update, context):
-    reply = ''
-    if __isTheOwner(update):
+    if UService.isTheOwner(update):
         typed_user = update.message.text.replace(
             '/removeuser', '').strip().lower()
         if typed_user != '':
-            table = db.table('AllowedUsers')
-            user = table.get(Query().telegram_name == typed_user)
-            table.remove(doc_ids=[user.doc_id])
+            UService.removeUser(typed_user)
             reply = 'user removed!'
         else:
             reply = 'You need to spcify a telegram name including @.'
     else:
         reply = 'You don\'t have permission. Only the owner can add new users.'
 
-    update.message.reply_text(reply)
+    if reply:
+        update.message.reply_text(reply)
 
 def listUsers(update, context):
-    reply = ''
-    if __isTheOwner(update):
-        reply = 'NOT IMPLEMENTED. CONTACT THE DEVELOPER'
-        #table = db.table('AllowedUsers')
-        #users = table.get(Query())
+    if UService.isTheOwner(update):
+        users = UService.listUsers()
+        update.message.reply_text(users)
     else:
         reply = 'You don\'t have permission. Only the owner can add new users.'
-    update.message.reply_text(reply)
-
-def latest(update, context):
-    if not __allowedUser(update):
-        update.message.reply_text(
-            f'You don\'t have permission to use this Bot.')
-        return
-
-    table = db.table('Config')
-
-    if len(table.all()) == 0:
-        latesteEventID = os.environ.get('ZONEMINDER_EVENT_ID_INITIAL')
-    else:
-        latesteEventID = table.all()[0]['EventID']
-
-    update.message.reply_text('Reading events...')
-    events = ZoneMinderDB().latestEvents(latesteEventID)
-
-    update.message.reply_text(f'The bot is processing {len(events)} videos...')
-
-    scrapper = ZoneMinderScraper()
-
-    if len(events) > 0:
-        try:
-            scrapper.processVideos(events)
-        except:
-            update.message.reply_text('Error while trying to catch videos. Try again.')
-            return
-
-        for id in scrapper.videoListError:
-            try:
-                events.remove(id)
-            except ValueError:
-                pass
-
-        for id in events:
-            subprocess.call(
-                f'ffmpeg -y -i src/Downloads/Event-_{id}-r4-s1.avi -strict -2 src/videos/{id}.mp4', shell=True)
-
-        erro = False
-        for id in events:
-            try:
-                context.bot.send_video(update.message.chat_id,
-                                       video=open(f'src/videos/{id}.mp4', 'rb'), timeout=240)
-
-            except:
-                update.message.reply_text(
-                    f'Erro while try to send video id: {id}')
-                print(f'Erro while try to send video id: {id}')
-                erro = True
-
-        if len(scrapper.videoListError) > 0:
-            update.message.reply_text(
-                f'Videos with error: {scrapper.videoListError}')
-
-        if not erro:
-            update.message.reply_text('You have all the videos.')
-
-            latesteEventID = events[len(events) - 1]
-
-            if len(table.all()) > 0:
-                table.update({'EventID': latesteEventID})
-            else:
-                table.insert({'EventID': latesteEventID})
-        
-        os.system("./scripts/clean-work_folders.sh")
-
-    listCommands(update, context)
+        update.message.reply_text(reply)
 
 def getPublicIP(update, context):
-    if not __allowedUser(update):
+    if UService.isTheOwner(update):
+        update.message.reply_text('Getting Public IP...')
+        try:
+            ns = NetworkService()
+            ip = ns.getPublicIP()
+            update.message.reply_text(f'Your Public IP is: {ip}')
+        except:
+            update.message.reply_text('ERROR while trying to get Public IP')
+    else:
+        update.message.reply_text(f'You don\'t have permission to use this Bot.')
+        return
+
+    listCommands(update)
+
+def listCommands(update):
+    if UService.isTheOwner(update):
+        update.message.reply_text('Commands Available')
+        update.message.reply_text('/getip')
+        update.message.reply_text('/latest')
+        update.message.reply_text('/removeuser')
+        update.message.reply_text('/adduser')
+        update.message.reply_text('/listusers')
+        update.message.reply_text('/test')
+    else:
+        update.message.reply_text('Commands Available')
+        update.message.reply_text('/latest')
+        update.message.reply_text('/getevent')
+
+@run_async
+def latest(update, context):
+    if not UService.isAllowedUser(update):
         update.message.reply_text(
             f'You don\'t have permission to use this Bot.')
         return
-    update.message.reply_text('Getting Public IP...')
-    try:
-        ip = get('https://api.ipify.org').text
-        update.message.reply_text(f'Your Public IP is: {ip}')
-    except:
-        update.message.reply_text('ERROR while trying to get Public IP')
-    
-    listCommands(update, context)
 
-def listCommands(update, context):
-    update.message.reply_text('Commands Available')
-    update.message.reply_text('/getip')
-    update.message.reply_text('/latest')
-    update.message.reply_text('/removeuser')
-    update.message.reply_text('/adduser')
-    update.message.reply_text('/listusers')
+    update.message.reply_text('Start to reading events...')
+    user_name = update.message.from_user.name.lower()
+    events = ZMService.getLatestEventsIDs(user_name, not UService.isTheOwner(update))
+
+    if len(events) == 0:
+        update.message.reply_text(f'There is no new videos to read...')
+        return
+    
+    update.message.reply_text(f'Start to processing {len(events)} videos...')
+    
+    videoGenerateErrorCount = 0
+    sendVideoErrorCount = 0
+    for event in reversed(events):
+        try:
+            videoPath = VService.videoGenerate(event)
+        except:
+            update.message.reply_text(f'ERROR while generating a video of the event. To try again use:')
+            update.message.reply_text(f'/getevent {event}')
+            videoGenerateErrorCount += 1
+            continue
+        try:
+            context.bot.send_video(update.message.chat_id,
+                                       video=open(videoPath, 'rb'), timeout=60)
+        except:
+            update.message.reply_text(f'ERROR while sending the video of the event. To try again use:')
+            update.message.reply_text(f'/getevent {event}')
+            sendVideoErrorCount += 1
+            continue
+        
+        VService.removeVideoFile(videoPath)
+    
+    if videoGenerateErrorCount == len(events) or sendVideoErrorCount == len(events):
+        update.message.reply_text('All videos with error. Try Again.')
+    else:
+        ZMService.saveLatestEventID(user_name, events[0])
+        update.message.reply_text('DONE You have all the videos.')
+    
+    listCommands(update)
+
+@run_async
+def getEvent(update, context):
+    if not UService.isAllowedUser(update):
+        update.message.reply_text(
+            f'You don\'t have permission to use this Bot.')
+        return
+
+    eventID = int(update.message.text.replace('/getevent', '').strip())
+
+    update.message.reply_text('Getting this event...')
+
+    if eventID <= 0:
+        update.message.reply_text(f'EventID is invalid.')
+        return
+    
+    update.message.reply_text(f'Start to processing the video...')
+
+    try:
+        videoPath = VService.videoGenerate(eventID)
+    except:
+        update.message.reply_text(f'ERROR while generating a video of the event number: {eventID}')
+    try:
+        context.bot.send_video(update.message.chat_id,
+                                    video=open(videoPath, 'rb'), timeout=240)
+    except:
+        update.message.reply_text(f'ERROR while sending the video of the event number: {eventID}')
+    
+    VService.removeVideoFile(videoPath)
+    update.message.reply_text('DONE You have the videos.')    
+    listCommands(update)
 
 if __name__ == '__main__':
     main()

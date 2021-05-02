@@ -1,38 +1,15 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  selenium-chrome:
-    build:
-      context: .
-      dockerfile: selenium.Dockerfile
-    image: selenium-chrome:1.0.0
-    restart: always
-    volumes:
-      - downloads:/home/seluser/Downloads:rw
-    ports:
-      - '4444:4444'
-    networks:
-      - telegram-bot
   telegram-bot:
     build:
       context: .
-      dockerfile: telegram-bot.Dockerfile
-    image: telegram-bot:1.0.3
+      dockerfile: Dockerfile
+    image: telegram-bot:2.0.0
     restart: always
     volumes:
-      - downloads:/usr/src/app/src/Downloads:ro
       - localDB:/usr/src/app/localDB:rw
-    networks:
-      - telegram-bot
-    depends_on:
-      - selenium-chrome
     env_file:
       - .env
-
-networks:
-  telegram-bot:
-    driver: overlay
-
 volumes:
-  downloads:
   localDB:

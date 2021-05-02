@@ -1,14 +1,7 @@
 TELEGRAM_BOT_API=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TELEGRAM_OWNER_NAME=@username
 
-MYSQL_HOST=xxx.xxx.xxx.xxx
-MYSQL_USER=xxxxx
-MYSQL_PASSWORD=xxxxxxxxx
-MYSQL_DATABASE=xx
-
 ZONEMINDER_URL=http://xxx.xxx.xxx.xxxx:xxxxxxx/zm
 ZONEMINDER_USER=xxxxxxxx
 ZONEMINDER_PASSWORD=xxxxxxxxx
 ZONEMINDER_EVENT_ID_INITIAL=37362
-
-SELENIUM_DRIVER=http://selenium-chrome:4444/wd/hub
