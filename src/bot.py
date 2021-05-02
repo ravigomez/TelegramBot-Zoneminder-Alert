@@ -159,7 +159,7 @@ def latest(update, context):
             continue
         try:
             context.bot.send_video(update.message.chat_id,
-                                       video=open(videoPath, 'rb'), timeout=60)
+                                       video=open(videoPath, 'rb'), timeout=240)
         except:
             update.message.reply_text(f'ERROR while sending the video of the event. To try again use:')
             update.message.reply_text(f'/getevent {event}')
