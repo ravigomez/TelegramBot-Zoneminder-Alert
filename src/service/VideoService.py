@@ -11,7 +11,7 @@ class VideoService:
 
   def videoGenerate(self, eventID: int) -> str:
     token = self.ZMService.getAccessToken()
-    url = self.ZMService.BASE_URL + f'/index.php?view=view_video&eid={eventID}&token={token}'
+    url = self.ZMService.BASE_URL + f'/index.php?view=view_video&eid={eventID}&rate=4x&token={token}'
     ramdomID = str(uuid.uuid4())
     videoPath = f"./temp/event_{eventID}_{ramdomID}.mp4"
 
