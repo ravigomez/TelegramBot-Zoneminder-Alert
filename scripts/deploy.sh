@@ -1,6 +1,7 @@
 #! /bin/bash
 
-#git pull
+git pull
+
 ./scripts/stop.sh
 if [ $? -eq 2 ]; then
     echo "Erro. Try again."
