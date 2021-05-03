@@ -4,6 +4,7 @@ RUN apt install cron -y
 RUN echo "0 0 * * * find /usr/src/app/temp/ -type f -exec rm -f {} +" >> ~/mycron
 RUN crontab -u root ~/mycron
 RUN rm ~/mycron
+RUN service cron start
 WORKDIR /usr/src/app
 RUN mkdir src
 COPY .env .
