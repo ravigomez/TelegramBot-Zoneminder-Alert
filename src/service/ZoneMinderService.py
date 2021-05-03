@@ -21,7 +21,7 @@ class ZoneMinderService:
     else:
       token = token_data['access_token']
       url = self.BASE_URL + f'/api/events/0.json?token={token}'
-      resp = requests.get(url)
+      resp = requests.get(url, timeout=15)
       if resp.status_code != 200:
         token_data = self.__generateNewAccessTokenData()
         
@@ -34,7 +34,7 @@ class ZoneMinderService:
   def __generateNewAccessTokenData(self):
     url = self.BASE_URL + f'/api/host/login.json'
     payload = {"user": self.ZM_USER, "pass": self.ZM_PASS}
-    resp = requests.post(url, data=payload)
+    resp = requests.post(url, data=payload, timeout=15)
     
     if resp.status_code == 200:
       token_data = resp.json()
@@ -48,7 +48,7 @@ class ZoneMinderService:
     while(True):
       url = self.BASE_URL + f'/api/events/{eventID}.json'
       try:
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=15)
 
         if not resp.success and resp.data.message == "Invalid event":
           break
@@ -63,7 +63,7 @@ class ZoneMinderService:
     while(True):
       url = self.BASE_URL + f'/api/events.json?page={page}&limit=30&sort=StartTime&direction=desc&token={token}'
       try:
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=15)
         if resp.status_code == 200:
           data = resp.json()
           time_limit = datetime.now() - timedelta(hours=24)
