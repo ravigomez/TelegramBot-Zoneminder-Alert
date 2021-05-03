@@ -9,7 +9,6 @@ RUN rm ~/mycron
 RUN service cron start
 RUN groupadd -r telegranbot && useradd --no-log-init -r -g telegranbot telegranbot
 WORKDIR /usr/src/app
-COPY .env .
 COPY Makefile .
 RUN mkdir src
 COPY src/requirements.txt ./src
