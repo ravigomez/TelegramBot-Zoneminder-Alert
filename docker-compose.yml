@@ -7,6 +7,13 @@ services:
       dockerfile: Dockerfile
     image: telegram-bot:2.0.0
     restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 1
+        window: 120s
     volumes:
       - localDB:/usr/src/app/localDB:rw
     env_file:
