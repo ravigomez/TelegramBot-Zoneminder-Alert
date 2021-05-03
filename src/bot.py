@@ -4,7 +4,6 @@ import logging
 
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from telegram.ext.dispatcher import run_async
 
 from service.ZoneMinderService import ZoneMinderService
 from service.NetworkService import NetworkService
@@ -130,7 +129,6 @@ def listCommands(update):
         update.message.reply_text('/latest')
         update.message.reply_text('/getevent')
 
-@run_async
 def latest(update, context):
     if not UService.isAllowedUser(update):
         update.message.reply_text(
@@ -152,16 +150,20 @@ def latest(update, context):
     for event in reversed(events):
         try:
             videoPath = VService.videoGenerate(event)
-        except:
-            update.message.reply_text(f'ERROR while generating a video of the event. To try again use:')
+        except Exception as ex:
+            update.message.reply_text(f'Error while generating a video of the event.')
+            update.message.reply_text(f'ERROR: {ex}')
+            update.message.reply_text(f'To try again use:')
             update.message.reply_text(f'/getevent {event}')
             videoGenerateErrorCount += 1
             continue
+        
         try:
             context.bot.send_video(update.message.chat_id,
                                        video=open(videoPath, 'rb'), timeout=240)
-        except:
-            update.message.reply_text(f'ERROR while sending the video of the event. To try again use:')
+        except Exception as ex:
+            update.message.reply_text(f'Error while sending the video of the event. To try again use:')
+            update.message.reply_text(f'ERROR: {ex}')
             update.message.reply_text(f'/getevent {event}')
             sendVideoErrorCount += 1
             continue
@@ -176,7 +178,6 @@ def latest(update, context):
     
     listCommands(update)
 
-@run_async
 def getEvent(update, context):
     if not UService.isAllowedUser(update):
         update.message.reply_text(
@@ -195,13 +196,17 @@ def getEvent(update, context):
 
     try:
         videoPath = VService.videoGenerate(eventID)
-    except:
-        update.message.reply_text(f'ERROR while generating a video of the event number: {eventID}')
+    except Exception as ex:
+        update.message.reply_text(f'Error while generating a video of the event number: {eventID}')
+        update.message.reply_text(f'ERROR: {ex}')
+        return
+    
     try:
         context.bot.send_video(update.message.chat_id,
                                     video=open(videoPath, 'rb'), timeout=240)
     except:
         update.message.reply_text(f'ERROR while sending the video of the event number: {eventID}')
+        return
     
     VService.removeVideoFile(videoPath)
     update.message.reply_text('DONE You have the videos.')    
