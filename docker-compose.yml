@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: telegram-bot:2.0.0
+    image: telegram-bot:2.0.1
     restart: always
     deploy:
       replicas: 1
