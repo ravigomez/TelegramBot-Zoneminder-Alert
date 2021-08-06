@@ -54,7 +54,7 @@ def main():
 def start(update, context):
     if UService.isAllowedUser(update):
         context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Hello {update.message.from_user.first_name} I\'m you bot. What can I do for you?")
+            chat_id=update.effective_chat.id, text=f"Hello {update.message.from_user.first_name} I\'m your bot. What can I do for you?")
     else:
         update.message.reply_text(
             f'You don\'t have permission to use this Bot.')
