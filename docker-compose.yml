@@ -1,35 +1,22 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  selenium-chrome:
-    image: selenium/standalone-chrome:3.141.59
-    restart: always
-    volumes:
-      - downloads:/home/seluser/Downloads:rw
-    ports:
-      - '4444:4444'
-    networks:
-      - telegram-bot
   telegram-bot:
     build:
       context: .
       dockerfile: Dockerfile
-    image: telegram-bot:1.0.0
+    image: telegram-bot:2.0.1
     restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 1
+        window: 120s
     volumes:
-      - downloads:/usr/src/app/src/Downloads:ro
       - localDB:/usr/src/app/localDB:rw
-    networks:
-      - telegram-bot
-    depends_on:
-      - selenium-chrome
     env_file:
       - .env
-
-networks:
-  telegram-bot:
-    driver: overlay
-
 volumes:
-  downloads:
   localDB:

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 autopep8==1.5.4
 certifi==2020.6.20
 cffi==1.14.1
@@ -16,10 +15,3 @@ tinydb==4.1.1
 toml==0.10.1
 tornado==6.0.4
 urllib3==1.25.10
-=======
-requests==2.25.1
-python_telegram_bot==13.5
-python-dotenv==0.17.1
-telegram==0.0.1
-tinydb==4.1.1
->>>>>>> 675e88a9fe0f94d9703c4bbb91478c7cc6f777fe

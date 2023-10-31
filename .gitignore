@@ -11,8 +11,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-src/Downloads/
-src/videos/
+src/Downloads/*
+src/videos/*
 eggs/
 .eggs/
 lib/
@@ -127,4 +127,6 @@ dmypy.json
 .vscode/settings.json
 src/.DS_Store
 .DS_Store
-localDB/*
+
+/localDB
+/temp

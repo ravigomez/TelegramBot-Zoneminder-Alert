@@ -1,0 +1,7 @@
+TELEGRAM_BOT_API=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TELEGRAM_OWNER_NAME=@username
+
+ZONEMINDER_URL=http://xxx.xxx.xxx.xxxx:xxxxxxx/zm
+ZONEMINDER_USER=xxxxxxxx
+ZONEMINDER_PASSWORD=xxxxxxxxx
+ZONEMINDER_EVENT_ID_INITIAL=37362
