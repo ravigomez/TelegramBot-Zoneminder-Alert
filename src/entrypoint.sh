@@ -1,0 +1,1 @@
+sudo chown -R seluser:seluser /home/seluser/Downloads/
